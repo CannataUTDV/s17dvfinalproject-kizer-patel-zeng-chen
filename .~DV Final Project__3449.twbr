@@ -758,7 +758,7 @@
             <column datatype='integer' name='[Visitors]' role='measure' type='quantitative' />
             <column caption='Year Time' datatype='date' name='[YearTime]' role='dimension' type='ordinal' />
             <column-instance column='[Visitors]' derivation='Sum' name='[sum:Visitors:qk]' pivot='key' type='quantitative' />
-            <column-instance column='[YearTime]' derivation='Year' name='[yr:YearTime:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[YearTime]' derivation='Year-Trunc' name='[tyr:YearTime:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='false' />
         </view>
@@ -768,11 +768,11 @@
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Bar' />
+            <mark class='Automatic' />
           </pane>
         </panes>
-        <rows>[federated.1l1e44t1yo3axk151cyka08xlqd7].[yr:YearTime:ok]</rows>
-        <cols>[federated.1l1e44t1yo3axk151cyka08xlqd7].[sum:Visitors:qk]</cols>
+        <rows>[federated.1l1e44t1yo3axk151cyka08xlqd7].[sum:Visitors:qk]</rows>
+        <cols>[federated.1l1e44t1yo3axk151cyka08xlqd7].[tyr:YearTime:qk]</cols>
       </table>
     </worksheet>
     <worksheet name='Sheet 2'>
@@ -1124,7 +1124,7 @@
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='Sheet 6'>
+    <window class='worksheet' name='Sheet 6'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1155,7 +1155,7 @@
         </highlight>
       </viewpoint>
     </window>
-    <window class='worksheet' name='Sheet 1'>
+    <window class='worksheet' maximized='true' name='Sheet 1'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1177,7 +1177,6 @@
         </edge>
       </cards>
       <viewpoint>
-        <zoom type='fit-width' />
         <highlight>
           <color-one-way>
             <field>[federated.1l1e44t1yo3axk151cyka08xlqd7].[none:UnitName:nk]</field>
