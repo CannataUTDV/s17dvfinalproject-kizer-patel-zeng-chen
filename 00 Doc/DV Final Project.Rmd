@@ -36,6 +36,10 @@ The boxplot shows:
 ##**Boxplot: Regions vs. Visits**
 <center>![](../03 Visualizations/TableauFinal6.png)</center>
 
+##**Scatterplot: Visits vs. Years**
+With that info in mind, we created a scatterplot of visits through the years, colored by regions:
+<center>![](../03 Visualizations/TableauFinal9.png)</center>
+
 #**Data.World Pull and ETL Operations**
 With our Tableau analysis complete, we pulled the data into R Studio.
 
@@ -61,3 +65,7 @@ Our final task is to perform ETL operations. This includes the removal of blank 
 source("../01 Data/natVisETL.R")
 ```
 
+#**Interesting Visualizations**
+
+#**Shiny Deployment**
+Our [Shiny deployment](https://jonathankizer.shinyapps.io/DVFinal/) displays the steps taken to reach the interesting visualizations.

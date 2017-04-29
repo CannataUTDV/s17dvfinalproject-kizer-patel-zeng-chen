@@ -8,18 +8,149 @@ require(readr)
 require(DT)
 require(leaflet)
 require(plotly)
+require(lubridate)
+
+online0 = TRUE
 
 natVisDF = query(
   data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
-  dataset="jonathankkizer/s-17-dv-final-project", type="sql",
+  dataset="jonathankkizer/s-17-dvproject-6", type="sql",
   query="SELECT * FROM NatVisDF s join `censusInfo.csv/censusInfo` r ON (s.State = r.State) join `stateLatLong.csv/stateLatLong` l ON (s.State = l.STATE)"
 )
+############################### Start shinyServer Function ####################
 
-shinyServer(function(input, output) { 
-  # These widgets are for the Barcharts tab.
-  online2 = reactive({input$rb2})
-  # Pulls data for data tab, rest of tabs; joins census data to national parks data
-  df2 <- eventReactive(input$click2, {
+shinyServer(function(input, output) {   
+  
+  # These widgets are for the Crosstabs tab.
+  KPI_Low = reactive({input$KPI1})     
+  KPI_Medium = reactive({input$KPI2})
+  
+  # Begin Box Plot Tab ------------------------------------------------------------------
+  dfbp1 <- eventReactive(input$click1, {
+    print("Getting from data.world")
+    natVisDF = query(
+      data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
+      dataset="jonathankkizer/s-17-dv-final-project", type="sql",
+      query="SELECT YearRaw, stateLatLong.STATE as State, Visitors, Region, UnitType, avg_Visitors, sum_Visitors, stateLatLong.LATITUDE, stateLatLong.LONGITUDE, stateLatLong.Location FROM NatVisDF s join `censusInfo.csv/censusInfo` r ON (s.State = r.State) join `stateLatLong.csv/stateLatLong` l ON (s.State = l.STATE)"
+    )
+    print("Creating window, joining data")
+    natVisDF1 = natVisDF %>% group_by(Region) %>% summarize(window_avg_visitors = mean(sum_Visitors))
+    dplyr::inner_join(natVisDF, natVisDF1, by = "Region")
+  }
+  
+  )
+  
+  output$boxplotData1 <- renderDataTable({DT::datatable(dfbp1(), rownames = FALSE,
+                                                        extensions = list(Responsive = TRUE, 
+                                                                          FixedHeader = TRUE)
+  )
+  })
+  
+  dfbp2 <- eventReactive(c(input$click1, input$boxVisitRange1), {
+    dfbp1() %>% dplyr::filter(Visitors >= input$boxVisitRange1[1] & Visitors <= input$boxVisitRange1[2]) # %>% View()
+  })
+  
+  output$boxplotPlot1 <- renderPlotly({
+    #View(dfbp3())
+    p <- ggplot(dfbp2()) + 
+      geom_boxplot(aes(x=Region, y=Visitors, colour=YearRaw)) + 
+      ylim(0, input$boxVisitRange1[2]) +
+      scale_y_continuous(labels = scales::comma) +
+      theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5))
+    ggplotly(p)
+  })
+  # End Box Plot Tab ___________________________________________________________
+  
+  # Begin Histogram Tab ------------------------------------------------------------------
+  dfh1 <- eventReactive(input$click2, {
+    print("Getting from data.world")
+    natVisDF = query(
+      data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
+      dataset="jonathankkizer/s-17-dv-final-project", type="sql",
+      query="SELECT YearRaw, stateLatLong.STATE as State, Visitors, Region, UnitType, avg_Visitors, sum_Visitors, stateLatLong.LATITUDE, stateLatLong.LONGITUDE, stateLatLong.Location FROM NatVisDF s join `censusInfo.csv/censusInfo` r ON (s.State = r.State) join `stateLatLong.csv/stateLatLong` l ON (s.State = l.STATE)"
+    )
+    print("Creating window, joining data")
+    natVisDF1 = natVisDF %>% group_by(Region) %>% summarize(window_avg_visitors = mean(sum_Visitors))
+    dplyr::inner_join(natVisDF, natVisDF1, by = "Region")
+  }
+  
+  )
+  
+  output$histogramData1 <- renderDataTable({DT::datatable(dfh1(), rownames = FALSE,
+                                                          extensions = list(Responsive = TRUE, 
+                                                                            FixedHeader = TRUE)
+  )
+  })
+  
+  output$histogramPlot1 <- renderPlotly({p <- ggplot(dfh1()) +
+    geom_histogram(aes(x=Visitors)) +
+    scale_x_continuous(labels = scales::comma) + 
+    theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5))
+  ggplotly(p)
+  })
+  # End Histogram Tab ___________________________________________________________
+  
+  # Begin Scatter Plots Tab ------------------------------------------------------------------
+  dfsc1 <- eventReactive(input$click3, {
+    print("Getting from data.world")
+    natVisDF = query(
+      data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
+      dataset="jonathankkizer/s-17-dv-final-project", type="sql",
+      query="SELECT YearRaw, stateLatLong.STATE as State, Visitors, Region, UnitType, avg_Visitors, sum_Visitors, stateLatLong.LATITUDE, stateLatLong.LONGITUDE, stateLatLong.Location FROM NatVisDF s join `censusInfo.csv/censusInfo` r ON (s.State = r.State) join `stateLatLong.csv/stateLatLong` l ON (s.State = l.STATE)"
+    )
+    print("Creating window, joining data")
+    natVisDF1 = natVisDF %>% group_by(Region) %>% summarize(window_avg_visitors = mean(sum_Visitors))
+    dplyr::inner_join(natVisDF, natVisDF1, by = "Region")
+  }
+  )
+  output$scatterData1 <- renderDataTable({DT::datatable(dfsc1(), rownames = FALSE,
+                                                        extensions = list(Responsive = TRUE, 
+                                                                          FixedHeader = TRUE)
+  )
+  })
+  output$scatterPlot1 <- renderPlotly({p <- ggplot(dfsc1()) + 
+    theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + 
+    theme(axis.text.y=element_text(size=10, hjust=0.5)) +
+    scale_y_continuous(labels = scales::comma) +
+    geom_point(aes(x=YearRaw, y=Visitors, colour=Region), size=1)
+  ggplotly(p)
+  })
+  # End Scatter Plots Tab ___________________________________________________________
+  
+  # Begin Crosstab Tab ------------------------------------------------------------------
+  dfct1 <- eventReactive(input$click4, {
+    print("Getting from data.world")
+    query(
+      data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
+      dataset="jonathankkizer/s-17-dv-final-project", type="sql",
+      query="select YearRaw as Year, State, Visitors, Region, UnitType, avg_Visitors, sum_Visitors,
+      
+      case
+      when Visitors / avg_Visitors < ? then '03 Low'
+      when Visitors / avg_Visitors < ? then '02 Medium'
+      else '01 High'
+      end AS kpi
+      
+      from NatVisDF
+      group by UnitType
+      ",
+      queryParameters = list(KPI_Low(), KPI_Medium())
+    ) # %>% View()
+    
+  })
+  output$data1 <- renderDataTable({DT::datatable(dfct1(), rownames = FALSE,
+                                                 extensions = list(Responsive = TRUE, FixedHeader = TRUE)
+  )
+  })
+  output$plot1 <- renderPlot({ggplot(dfct1()) + 
+      theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + 
+      theme(axis.text.y=element_text(size=10, hjust=0.5)) +
+      geom_text(aes(x=Region, y=UnitType, label=Visitors), size=4) +
+      geom_tile(aes(x=Region, y=UnitType, fill=kpi), alpha=0.50)
+  })
+  # End Crosstab Tab ___________________________________________________________
+  # Begin Barchart Tab ------------------------------------------------------------------
+  df2 <- eventReactive(input$click5, {
     print("Getting from data.world")
     natVisDF = query(
       data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"),
@@ -30,8 +161,6 @@ shinyServer(function(input, output) {
     natVisDF1 = natVisDF %>% group_by(Region) %>% summarize(window_avg_visitors = mean(sum_Visitors))
     dplyr::inner_join(natVisDF, natVisDF1, by = "Region")
   })
-  
-  
   #Output for Data tab
   output$barchartData1 <- renderDataTable({DT::datatable(df2(),
                                                          rownames = FALSE,
@@ -61,12 +190,10 @@ shinyServer(function(input, output) {
   # geom_hline(aes(yintercept = round(avg_Visitors)), color="red")
   #})
   
-  
-  
-
-  output$barchartMap1 <- renderLeaflet({leaflet() %>% 
+  output$barchartMap1 <- renderLeaflet({leaflet(width = 400, height = 800) %>% 
       setView(lng = -98.35, lat = 39.5, zoom = 4) %>% 
-      addTiles() %>%
+      addTiles() %>% 
+      #addProviderTiles("MapQuestOpen.Aerial") %>%
       addMarkers(lng = natVisDF$LONGITUDE,
                  lat = natVisDF$LATITUDE,
                  options = markerOptions(draggable = TRUE, riseOnHover = TRUE),
