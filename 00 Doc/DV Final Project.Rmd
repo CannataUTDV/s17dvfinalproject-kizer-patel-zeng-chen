@@ -1,0 +1,63 @@
+---
+title: "National Parks Visits"
+author: "Jonathan Kizer, Victor Chen, Leo Zeng, Kishan Patel"
+output:
+  html_document:
+    toc: yes
+  html_notebook:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<center>![](../00 Doc/grandcanyon.jpg)</center>
+
+
+#**R Configuration**
+
+Our R Configuration is as follows:
+```{r sessionInfo}
+sessionInfo(package=NULL)
+```
+
+#**Data**
+Our original data is [sourced from Data.World](https://data.world/inform8n/us-national-parks-visitation-1904-2016-with-boundaries). This data includes visits by National Parks from 1904-2016. We joined this data with population and gender breakdown by state from the US Census Data. Finally, we joined Latitude and Longitude points for each of the 50 U.S. States, as well as Washington D.C.
+
+#**Initial Analysis**
+Our initial analysis was performed in Tableau.
+
+We began by creating a boxplot that showed how national park visits differed by operating region. The below image shows how the National Parks Service breaks its parks into different regions:
+
+<center>![](../03 Visualizations/natparksorg.png)</center>
+ 
+The boxplot shows:
+
+##**Boxplot: Regions vs. Visits**
+<center>![](../03 Visualizations/TableauFinal6.png)</center>
+
+#**Data.World Pull and ETL Operations**
+With our Tableau analysis complete, we pulled the data into R Studio.
+
+##**Data.World Pulls**
+First, our initial National Parks Visits data was pulled:
+```{r NatVisPull}
+source("../01 Data/prETLNatVisPull.R")
+```
+
+Next, the Census Data is pulled:
+```{r censusPull}
+source("../01 Data/censusPull.R")
+```
+
+Finally, the Latitude and Longitude information is pulled:
+```{r stateLatLongPull.R}
+source("../01 Data/stateLatLongPull.R")
+```
+
+##**ETL**
+Our final task is to perform ETL operations. This includes the removal of blank data, as well as character formatting to better meet our needs for further visualization in R.
+```{r ETL}
+source("../01 Data/natVisETL.R")
+```
+
