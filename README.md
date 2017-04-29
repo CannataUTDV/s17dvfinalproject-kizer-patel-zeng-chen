@@ -6,5 +6,5 @@
 Anaylsis Goal: Analyze visitation hotspots based on tourist number to different national parks separated by state, compare vistation trends with other data sources
 
 
-### Github repository is [here] (https://github.com/CannataUTDV/s17dvfinalproject-kizer-patel-zeng-chen)
+### Github repository is [here](https://github.com/CannataUTDV/s17dvfinalproject-kizer-patel-zeng-chen)
 
