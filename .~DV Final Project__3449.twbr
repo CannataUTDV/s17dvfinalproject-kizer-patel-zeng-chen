@@ -1097,10 +1097,8 @@
           </datasources>
           <datasource-dependencies datasource='federated.1l1e44t1yo3axk151cyka08xlqd7'>
             <column datatype='string' name='[Region]' role='dimension' type='nominal' />
-            <column datatype='string' name='[State]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
             <column datatype='integer' name='[Visitors]' role='measure' type='quantitative' />
             <column-instance column='[Region]' derivation='None' name='[none:Region:nk]' pivot='key' type='nominal' />
-            <column-instance column='[State]' derivation='None' name='[none:State:nk]' pivot='key' type='nominal' />
             <column-instance column='[Visitors]' derivation='Sum' name='[sum:Visitors:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <aggregation value='false' />
@@ -1112,9 +1110,6 @@
               <breakdown value='auto' />
             </view>
             <mark class='Circle' />
-            <encodings>
-              <color column='[federated.1l1e44t1yo3axk151cyka08xlqd7].[none:State:nk]' />
-            </encodings>
             <reference-line axis-column='[federated.1l1e44t1yo3axk151cyka08xlqd7].[sum:Visitors:qk]' boxplot-mark-exclusion='false' boxplot-whisker-type='standard' enable-instant-analytics='true' formula='average' id='refline0' label-type='automatic' probability='95' scope='per-cell' symmetric='false' value-column='[federated.1l1e44t1yo3axk151cyka08xlqd7].[sum:Visitors:qk]' z-order='1' />
             <style>
               <style-rule element='mark'>
@@ -1147,11 +1142,6 @@
           </strip>
           <strip size='31'>
             <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='160'>
-            <card pane-specification-id='0' param='[federated.1l1e44t1yo3axk151cyka08xlqd7].[none:State:nk]' type='color' />
           </strip>
         </edge>
       </cards>

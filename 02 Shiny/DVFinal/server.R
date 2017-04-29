@@ -61,8 +61,9 @@ shinyServer(function(input, output) {
   # geom_hline(aes(yintercept = round(avg_Visitors)), color="red")
   #})
   
-  # REMOVE BEFORE SUBMISSION 
-  # DO NOT FUCKING TOUCH THIS CODE 
+  
+  
+
   output$barchartMap1 <- renderLeaflet({leaflet() %>% 
       setView(lng = -98.35, lat = 39.5, zoom = 4) %>% 
       addTiles() %>%
