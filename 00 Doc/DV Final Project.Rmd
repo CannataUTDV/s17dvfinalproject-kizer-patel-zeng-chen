@@ -46,6 +46,15 @@ Additionally, we decided to break visits down by both state and region, and crea
 
 ##**Barchart: Park Name vs. Visits**
 Moving forward, we decided to try and analyze which parks had the highest numbers of visits over this time period. We created the following visualization, and then selected all parks with visits greater than 100 million into a new set. This set was then used to create our second Interesting Visualization.
+
+The five most-visited parks are as follows:
+
+  * Golden Gate National Recreation Area, California
+  * Natchez Trace Parkway, Mississippi
+  * Lake Mead National Recreation Area, Nevada
+  * George Washington Memorial, Washington, D.C.
+  * Gateway National Recreation Area, New Jersey
+
 <center>![](../03 Visualizations/FinalTableau2.png)</center>
 
 ##**Join: State vs. Visits, Colored by Male-Female Ratio**
