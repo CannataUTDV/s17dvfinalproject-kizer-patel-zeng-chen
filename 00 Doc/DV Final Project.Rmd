@@ -77,6 +77,8 @@ Our final task is to perform ETL operations. This includes the removal of blank 
 source("../01 Data/natVisETL.R")
 ```
 
+The ETL script is available to view in "01 Data," or as an image [here](http://i.imgur.com/zk6lYXI.png).
+
 #**Interesting Visualizations**
 ##**1: Massive Success of "Mission 66"**
 <center>![](../03 Visualizations/FinalTableau1[victor].png)</center>
@@ -96,4 +98,4 @@ This visualization highlights states with parks that have combined visits betwee
 This visualization shows visits by state, filtered by year, and colored by the ratio of **visits to state population**. The goal here is to identify states or areas that bring in vastly more visitors than their populations. Washington, D.C., a city with a population of approximately 670,000 people, draws almost 55 times its population in visitors to its National Parks and Monuments. Another state where this occurs is Wyoming, which draws nearly 17 times its population in visits. 
 
 #**Shiny Deployment**
-Our [Shiny deployment](https://jonathankizer.shinyapps.io/DVFinal/) displays the steps taken to reach the interesting visualizations.
+We took the .CSV files produced in our above ETL and Pull operations, and in turn [uploaded them to Data.World](https://data.world/jonathankkizer/s-17-dv-final-project). From there, our Shiny app uses SQL to query relevant data to create a variety of visualizations in R. Our [Shiny deployment](https://jonathankizer.shinyapps.io/DVFinal/) displays the steps taken to reach the interesting visualizations.
