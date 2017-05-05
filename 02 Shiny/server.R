@@ -25,6 +25,45 @@ shinyServer(function(input, output) {
   KPI_Low = reactive({input$KPI1})     
   KPI_Medium = reactive({input$KPI2})
   
+  # Begin IV Plot Tab
+  dfIV1 <-query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
+                dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
+                query="SELECT YearRaw, sum(Visitors) as Visitors
+                FROM NatVisDF 
+                group by YearRaw
+                order by YearRaw"
+  )
+
+  output$IV1 <- renderPlotly({
+    dfIV1Gas <- query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
+                      dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
+                      query="select Year as YearRaw, `GasPrices.csv/GasPrices`.`Retail Gasoline Price 
+(Constant 2015 dollars/gallon)` as Price from GasPrices"
+    )
+    
+    dfIV1 <- inner_join(dfIV1, dfIV1Gas)
+    # Note: Previous idea of gas prices rising meant visitors fell disproven; Coefficient of Correlation of only ~.03
+    #print(cor(dfIV1$Visitors, dfIV1$Price,  method = "pearson", use = "complete.obs"))
+    p <- ggplot(data=dfIV1) + 
+      geom_line(aes(x=YearRaw, y=Visitors)) + 
+      scale_y_continuous(labels = scales::comma) +
+      theme(axis.text.x=element_text(size=10, vjust=0.5))
+    ggplotly(p)
+  })
+  
+  dfIV2 <-query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
+                dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
+                query="SELECT YearRaw, censusInfo.State as State, sum(Visitors) as Visitors, sum(Visitors) / censusInfo.population as Ratio FROM NatVisDF s join `censusInfo.csv/censusInfo` r ON (s.State = r.State) where YearRaw = 2016 group by censusInfo.State"
+  )
+  
+  output$IV2 <- renderPlotly({
+    p <- ggplot(data=dfIV2, aes(x=State, y=Visitors, fill = Ratio)) +
+      geom_bar(stat = "identity") +
+      scale_y_continuous(labels = scales::comma) +
+      theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5))
+    ggplotly(p)
+  })
+  
   # Begin Box Plot Tab ------------------------------------------------------------------
   dfbp1 <- eventReactive(input$click1, {
     print("Getting from data.world")

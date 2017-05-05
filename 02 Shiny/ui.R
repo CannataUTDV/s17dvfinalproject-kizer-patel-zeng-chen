@@ -14,7 +14,8 @@ dashboardPage(
       menuItem("Histograms", tabName = "histogram", icon = icon("dashboard")),
       menuItem("Scatter Plots", tabName = "scatter", icon = icon("dashboard")),
       menuItem("Crosstabs, KPIs, Parameters", tabName = "crosstab", icon = icon("dashboard")),
-      menuItem("Barcharts, Table Calculations", tabName = "barchart", icon = icon("dashboard"))
+      menuItem("Barcharts, Table Calculations", tabName = "barchart", icon = icon("dashboard")),
+      menuItem("Interesting Visualizations", tabName = "IV", icon = icon("dashboard"))
     )
   ),
   dashboardBody(
@@ -23,6 +24,21 @@ dashboardPage(
                ".shiny-output-error:before { visibility: hidden; }"
     ),    
     tabItems(
+      # Begin Interesting Visualizations tab content.
+      tabItem(tabName = "IV",
+              tabsetPanel(
+                tabPanel("Visitor Correlations",
+                         plotlyOutput("IV1", height = 500)
+                ),
+                tabPanel("Population Ratio",
+                         plotlyOutput("IV2", height = 500)
+                ),
+                tabPanel("Map",
+                         plotlyOutput("IV3", height = 500)
+                )
+              )
+      ),
+      # End IV content.
       # Begin Box Plots tab content.
       tabItem(tabName = "boxplot",
               tabsetPanel(
