@@ -33,8 +33,8 @@ dashboardPage(
                 tabPanel("Population Ratio",
                          plotlyOutput("IV2", height = 500)
                 ),
-                tabPanel("Map",
-                         plotlyOutput("IV3", height = 500)
+                tabPanel("Parks w/ All-Time Visits > 100,000,000",
+                         leafletOutput("IVMap1", height = 500)
                 )
               )
       ),

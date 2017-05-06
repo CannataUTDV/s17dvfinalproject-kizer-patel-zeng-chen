@@ -35,13 +35,6 @@ shinyServer(function(input, output) {
   )
 
   output$IV1 <- renderPlotly({
-    dfIV1Gas <- query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
-                      dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
-                      query="select Year as YearRaw, `GasPrices.csv/GasPrices`.`Retail Gasoline Price 
-(Constant 2015 dollars/gallon)` as Price from GasPrices"
-    )
-    
-    dfIV1 <- inner_join(dfIV1, dfIV1Gas)
     # Note: Previous idea of gas prices rising meant visitors fell disproven; Coefficient of Correlation of only ~.03
     #print(cor(dfIV1$Visitors, dfIV1$Price,  method = "pearson", use = "complete.obs"))
     p <- ggplot(data=dfIV1) + 
@@ -62,6 +55,29 @@ shinyServer(function(input, output) {
       scale_y_continuous(labels = scales::comma) +
       theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5))
     ggplotly(p)
+  })
+  
+  dfIV3 <- query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
+                 dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
+                 query="select NatVisDF.UnitName, sum(NatVisDF.Visitors) as sumVisits, NatVisDF.State from NatVisDF group by NatVisDF.UnitName, NatVisDF.State having sum(`NatVisDF.csv/NatVisDF`.Visitors) > 100000000"
+  )
+  dfIV3LatLong <- query(data.world(token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9kLXVzZXItY2xpZW50OmpvbmF0aGFua2tpemVyIiwiaXNzIjoiYWdlbnQ6am9uYXRoYW5ra2l6ZXI6OjlkOWM5MDBlLTc0N2MtNDM5Yi04YmVhLWYwMTRjMzVkZjY1YiIsImlhdCI6MTQ4NDY5NzI4NCwicm9sZSI6WyJ1c2VyX2FwaV93cml0ZSIsInVzZXJfYXBpX3JlYWQiXSwiZ2VuZXJhbC1wdXJwb3NlIjp0cnVlfQ.xVPkWdDyKxmAd6GK2KN8DxRZZCNk23snYhMAgoaMhmPsNO-2XuNQwAwLE2EXyTaJV9xPWg52am1_RmfmUqezVQ", propsfile = "www/.data.world"), 
+                        dataset="jonathankkizer/s-17-dv-final-project", type="sql", 
+                        query="select stateLatLong.STATE as State, stateLatLong.LATITUDE, stateLatLong.LONGITUDE from stateLatLong"
+  )
+  
+  dfIV3 <- dplyr::inner_join(dfIV3, dfIV3LatLong)
+  
+  output$IVMap1 <- renderLeaflet({leaflet(width = 400, height = 800) %>% 
+      setView(lng = -98.35, lat = 39.5, zoom = 4) %>% 
+      addTiles() %>% 
+      #addProviderTiles("MapQuestOpen.Aerial") %>%
+      addMarkers(lng = dfIV3$LONGITUDE,
+                 lat = dfIV3$LATITUDE,
+                 options = markerOptions(draggable = TRUE, riseOnHover = TRUE),
+                 popup = as.character(paste(dfIV3$UnitName, 
+                                            ": ", dfIV3$sumVisits,
+                                            ", ", dfIV3$State)) )
   })
   
   # Begin Box Plot Tab ------------------------------------------------------------------

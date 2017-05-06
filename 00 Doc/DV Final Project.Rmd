@@ -25,7 +25,7 @@ sessionInfo(package=NULL)
 Our original data is [sourced from Data.World](https://data.world/inform8n/us-national-parks-visitation-1904-2016-with-boundaries). This data includes visits by National Parks from 1904-2016. We joined this data with population and gender breakdown by state from the US Census Data. Finally, we joined Latitude and Longitude points for each of the 50 U.S. States, as well as Washington D.C.
 
 #**Initial Analysis**
-Our initial analysis was performed in Tableau.
+Our initial analysis was performed in Tableau. Our initial analysis utilized .CSV files produced from our ETL operations, which are covered in-depth below.
 
 We began by creating a boxplot that showed how national park visits differed by operating region. The below image shows how the National Parks Service breaks its parks into different regions:
 
@@ -85,6 +85,8 @@ Our final task is to perform ETL operations. This includes the removal of blank 
 ```{r, code = readLines("../01 Data/natVisETL.R")}
 ```
 
+Lastly, we also utilized [historical fuel price data](https://energy.gov/eere/vehicles/downloads/fact-915-march-7-2016-average-historical-annual-gasoline-pump-price-1929) to determine if there is any correlation in fuel price to national park visitor rates. As mentioned in our Interesting Visualizations summary, we found that there is essentially no correlation between the two, disproving one of our hypotheses. The correlation test results are viewable below, the first interesting visualization. This data set required no manipulation, and was simply converted to a .CSV file and [uploaded to data.world](https://data.world/jonathankkizer/s-17-dv-final-project).
+
 #**Interesting Visualizations**
 ##**1: Massive Success of "Mission 66"**
 <center>![](../03 Visualizations/FinalTableau1[victor].png)</center>
@@ -92,6 +94,12 @@ Our final task is to perform ETL operations. This includes the removal of blank 
 Of note here: first, **National Park visits actually grew during the Great Depression and Great Recession, indicating that visits to these parks aren't considered discretionary spending.** Additionally, it could be that a poor economy has consumers scrambling to find cheaper vacations, and National Parks fill that role. Lastly, stress during difficult economic times may spur people to want to be outdoors and enjoy nature.
 
 However, the most interesting aspect of this is the massive growth experienced in National Parks visits during "Mission 66." **Mission 66 involved a massive amount of infrastructure creation to make parks more accessible.** In addition to roads and trails, it also funded the creation of camping and housing sites, and also an advertising campaign that promoted the natural beauty of these parks to citizens across the country.
+
+We originally also believed that downturns in the number of visitors would correlate with rises in the price of fuel, as most visitors would rely on their personal vehicles to reach and tour the parks. With the following slice, we perform a correlation test. In this test, we find that there is essentially no real correlation with the data. We use prices measured in 2015 dollars to remove the upward-trend in fuel prices due to inflation that occurred throughout the past century.
+
+```{r correlationTest}
+source("../01 Data/fuelCorrelationTest.R")
+```
 
 ##**2: Most Popular States With Most Popular Parks**
 <center>![](../03 Visualizations/FinalTableau3.png)</center>
@@ -104,4 +112,4 @@ This visualization highlights states with parks that have combined visits betwee
 This visualization shows visits by state, filtered by year, and colored by the ratio of **visits to state population**. The goal here is to identify states or areas that bring in vastly more visitors than their populations. Washington, D.C., a city with a population of approximately 670,000 people, draws almost 55 times its population in visitors to its National Parks and Monuments. Another state where this occurs is Wyoming, which draws nearly 17 times its population in visits. 
 
 #**Shiny Deployment**
-We took the .CSV files produced in our above ETL and Pull operations, and in turn [uploaded them to Data.World](https://data.world/jonathankkizer/s-17-dv-final-project). From there, our Shiny app uses SQL to query relevant data to create a variety of visualizations in R. Our [Shiny deployment](https://jonathankizer.shinyapps.io/DVFinal/) displays the steps taken to reach the interesting visualizations.
+We took the .CSV files produced in our above ETL and Pull operations, and in turn [uploaded them to Data.World](https://data.world/jonathankkizer/s-17-dv-final-project). From there, our Shiny app uses SQL to query relevant data to create a variety of visualizations in R. Our [Shiny deployment](https://jonathankizer.shinyapps.io/DVFinal/) displays the steps taken to reach the interesting visualizations, as well as our interesting visualizations, albeit without some helpful annotations and background information.
